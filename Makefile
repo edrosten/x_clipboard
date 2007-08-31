@@ -5,10 +5,12 @@ OFLAGS=
 # the install prefix is overridable with 'make PREFIX=/usr/bin' 
 PREFIX = /usr/local
 
+DATADIR=$(PREFIX)/share/x_clipboard/
+
 
 LDFLAGS=-L /usr/X11R6/lib -lX11
 
-CXXFLAGS=$(DFLAGS) $(OFLAGS) -Wall 
+CXXFLAGS=$(DFLAGS) $(OFLAGS) -Wall -DDATADIR=\"$(DATADIR)\"
 
 CC=$(CXX)
 
@@ -23,5 +25,8 @@ paste:paste.o
 selection:selection.o
 	$(CC) -o $@ $^ $(LDFLAGS) $(DFLAGS) $(OFLAGS)
 
-install:
+install:paste selection
+	mkdir -p $(PREFIX)/bin
 	cp paste selection $(PREFIX)/bin
+	mkdir -p $(DATADIR)
+	cp r0x0r.* $(DATADIR)

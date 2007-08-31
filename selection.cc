@@ -50,14 +50,29 @@ string GetAtomName(Display* disp, Atom a)
 		return XGetAtomName(disp, a);
 }
 
-string read_whole_file(const string& name)
+string read_whole_file(const string& name, string& fullname)
 {
 	//A simple, inefficient function for reading a 
 	//whole file in to memory
 	ostringstream f;
 	ifstream file;
 
-	file.open(name.c_str(), ios::binary);
+	//Try in the current directory first, then in the data directory
+	{
+		vector<char> buf(4096, 0);
+		getcwd(&buf[0], 4095);
+		fullname = &buf[0] + string("/") + name;
+	}	
+
+	file.open(fullname.c_str(), ios::binary);
+
+	if(!file.good())
+	{
+		fullname = DATADIR + name;
+		file.open(fullname.c_str(), ios::binary);
+	}
+
+
 	f << file.rdbuf();
 	
 	return f.str();
@@ -70,6 +85,7 @@ void set_targets_property(Display* disp, Window w, map<Atom, string>& typed_data
 
 	vector<Atom> targets; targets.push_back(XA_TARGETS);
 	targets.push_back(XA_multiple);
+
 
 	for(map<Atom,string>::const_iterator i=typed_data.begin(); i != typed_data.end(); i++)
 		targets.push_back(i->first);
@@ -273,17 +289,20 @@ int main(int argc, char**argv)
 	//of files in the current directory, and the URL of the PNG,
 	//in various incarnations.
 	map<Atom, string> typed_data;
-	string url = string("file://") + getenv("PWD") + "/r0x0r.png";
+	string url;
 	
+	typed_data[XA_image_bmp] = read_whole_file("r0x0r.bmp", url);
+	typed_data[XA_image_jpg] = read_whole_file("r0x0r.jpg", url);
+	typed_data[XA_image_tiff] = read_whole_file("r0x0r.tiff", url);
+	typed_data[XA_image_png] = read_whole_file("r0x0r.png", url);
+
+	url = "file://" + url;
+
 	typed_data[XA_text_uri_list] = url;
 	typed_data[XA_text_uri] = url;
 	typed_data[XA_text_plain] = url;
 	typed_data[XA_text] = url;
 	typed_data[XA_STRING] = url;
-	typed_data[XA_image_bmp] = read_whole_file("r0x0r.bmp");
-	typed_data[XA_image_png] = read_whole_file("r0x0r.png");
-	typed_data[XA_image_jpg] = read_whole_file("r0x0r.jpg");
-	typed_data[XA_image_tiff] = read_whole_file("r0x0r.tiff");
 
 	
 	
