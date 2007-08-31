@@ -122,7 +122,9 @@ datatypes you can provide. As the mouse moves, you send XdndPosition events, and
 the application replies with XdndStatus. If a drop is possible, then you will
 change the mouse pointer to indicate this. If you leave the XdndAware window,
 you send an XdndLeave event, and if the mouse button is released, you ungrab the
-mouse and send an XdndDrop event (if a drop is possible).
+mouse and send an XdndDrop event (if a drop is possible). If a drop really
+occurs, then the data transfer will proceed as a normal paste operation, using
+the XdndSelection clipboard.
 
 
 [1] XDnD also provides the first three targets in the first message it sends.

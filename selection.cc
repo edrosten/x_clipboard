@@ -11,9 +11,15 @@
 #include <vector>
 using namespace std;
 
+//See paste.cc for a description of how the copy/paste and XDnD state machine works.
+
+//See process_selection_request to see how to perform a paste when a SelectionNotify
+//event arrives.
+
+//see main for a sample implementation of an Xdnd state machine.
+
 
 //Define atome not defined in Xatom.h
-Atom XA_wm_state;
 
 Atom XA_TARGETS;
 Atom XA_multiple;
@@ -37,23 +43,28 @@ Atom XA_XdndStatus;
 Atom XA_XdndDrop;
 Atom XA_XdndFinished;
 
+//The three states of Xdnd: we're over a window which does not
+//know about XDnD, we're over a window which does know, but won't
+//allow a drop (because we offer no suitable datatype), or we're 
+//over a window which will accept a drop.
 #define UNAWARE 0
 #define UNRECEPTIVE 1
 #define CAN_DROP 2
 
+//Utility function for getting the atom name as a string.
 string GetAtomName(Display* disp, Atom a)
 {
-	//Utility function for getting the atom name as a string.
 	if(a == None)
 		return "None";
 	else
 		return XGetAtomName(disp, a);
 }
 
+
+//A simple, inefficient function for reading a 
+//whole file in to memory
 string read_whole_file(const string& name, string& fullname)
 {
-	//A simple, inefficient function for reading a 
-	//whole file in to memory
 	ostringstream f;
 	ifstream file;
 
@@ -72,16 +83,17 @@ string read_whole_file(const string& name, string& fullname)
 		file.open(fullname.c_str(), ios::binary);
 	}
 
-
 	f << file.rdbuf();
 	
 	return f.str();
 }
 
+
+//Construct a list of targets and place them in the specified property This
+//consists of all datatypes we know of as well as TARGETS and MULTIPLE. Reading
+//this property tell the application wishing to paste which datatypes we offer.
 void set_targets_property(Display* disp, Window w, map<Atom, string>& typed_data, Atom property)
 {
-	//Construct a list of targets and place them in the specified property This
-	//consists of all datatypes we know of as well as tragets and multiple.
 
 	vector<Atom> targets; targets.push_back(XA_TARGETS);
 	targets.push_back(XA_multiple);
@@ -101,11 +113,13 @@ void set_targets_property(Display* disp, Window w, map<Atom, string>& typed_data
 					(unsigned char*)&targets[0], targets.size());
 }
 
+
+
+//This function essentially performs the paste operation: by converting the
+//stored data in to a format acceptable to the destination and replying
+//with an acknowledgement.
 void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 {
-	//This function essentially performs the paste operation: by converting the
-	//stored data in to a format acceptable to the destination and replying
-	//with an acknowledgement.
 
 	if(e.type != SelectionRequest)
 		return;
@@ -192,12 +206,11 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 }
 
 
-
+//Find the applications top level window under the mouse.
 Window find_app_window(Display* disp, Window w)
 {
 	//Drill down the windows under the mouse, looking for
-	//the window with the WM_STATE property. This is the 
-	//application window, apparently.
+	//the window with the XdndAware property.
 
 	int nprops, i=0;
 	Atom* a;
@@ -205,9 +218,10 @@ Window find_app_window(Display* disp, Window w)
 	if(w == 0)
 		return 0;
 
+	//Search for the WM_STATE property
 	a = XListProperties(disp, w, &nprops);
 	for(i=0; i < nprops; i++)
-		if(a[i] == XA_wm_state)
+		if(a[i] == XA_XdndAware)
 			break;
 
 	if(nprops)
@@ -216,6 +230,7 @@ Window find_app_window(Display* disp, Window w)
 	if(i != nprops)
 		return w;
 	
+	//Drill down one more level.
 	Window child, wtmp;
 	int tmp;
 	unsigned int utmp;
@@ -262,7 +277,6 @@ int main(int argc, char**argv)
 		
 	
 	//None of these atoms are provided in Xatom.h
-	XA_wm_state = XInternAtom(disp, "WM_STATE", False);
 	XA_TARGETS = XInternAtom(disp, "TARGETS", False);
 	XA_multiple = XInternAtom(disp, "MULTIPLE", False);
 	XA_image_bmp = XInternAtom(disp, "image/bmp", False);
@@ -284,12 +298,11 @@ int main(int argc, char**argv)
 	XA_XdndDrop = XInternAtom(disp, "XdndDrop", False);
 	XA_XdndFinished = XInternAtom(disp, "XdndFinished", False);
 	
-	//Create a mapping between the data type (specified as an atom)
-	//and the actual data. The data consists of a prespecified list
-	//of files in the current directory, and the URL of the PNG,
-	//in various incarnations.
-	map<Atom, string> typed_data;
-	string url;
+	//Create a mapping between the data type (specified as an atom) and the
+	//actual data. The data consists of a prespecified list of files in the
+	//current or install directory, and the URL of the PNG, in various
+	//incarnations. 
+	map<Atom, string> typed_data; string url;
 	
 	typed_data[XA_image_bmp] = read_whole_file("r0x0r.bmp", url);
 	typed_data[XA_image_jpg] = read_whole_file("r0x0r.jpg", url);
@@ -329,7 +342,11 @@ int main(int argc, char**argv)
 	Window previous_window=0;          //Window found by the last MotionNotify event.
 	int previous_version = -1;         //XDnD version of previous_window
 	int status=UNAWARE;               
+	
 
+	//Create three cursors for the three different XDnD states.
+	//I think a turkey is a good choice for a program which doesn't
+	//understand Xdnd.
 	Cursor grab_bad =XCreateFontCursor(disp, XC_gobbler);
 	Cursor grab_maybe =XCreateFontCursor(disp, XC_circle);
 	Cursor grab_good =XCreateFontCursor(disp, XC_sb_down_arrow);
@@ -345,7 +362,10 @@ int main(int argc, char**argv)
 			return 0;
 		}
 		else if(e.type == SelectionRequest)
+		{
+			//A request to paste has occured.
 			process_selection_request(e, typed_data);
+		}
 		else if(e.type == MotionNotify && dragging == 0)
 		{
 			if(XGrabPointer(disp, w, True, Button1MotionMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, root, grab_bad, CurrentTime) == GrabSuccess)
@@ -367,17 +387,17 @@ int main(int argc, char**argv)
 			int fmt;
 			unsigned long nitems, bytes_remaining;
 			unsigned char *data = 0;
-		
+
 			//Look for XdndAware in the window under the pointer. So, first, 
 			//find the window under the pointer.
-			
 			window = find_app_window(disp, root);
 			cout << "Application window is: 0x" << hex << window << dec << endl;
 			
+			
 
-
-
-			if(window == None)
+			if(window == previous_window)
+				version = previous_version;
+			else if(window == None)
 				;
 			else if(XGetWindowProperty(disp, window, XA_XdndAware, 0, 2, False, AnyPropertyType, &atmp, &fmt, &nitems, &bytes_remaining, &data) != Success)
 				cout << "Property read failed.\n";
