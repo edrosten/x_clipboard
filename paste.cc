@@ -76,7 +76,8 @@ convert it in to? You tell it the name (ie atom) of the format you want. But how
 do you know what to ask for? Well, first, you ask for a meta-format called
 TARGETS. This causes the program to send you a list of the format names (atoms)
 which it is able to convert to. You can then pick a suitable one from the list
-and ask for it.
+and ask for it. When you ask for data using XConvertSelection, the program you 
+with the data received a SelectionNotify event.
 
 All converted data is communicated via a property on the destination window.
 This means you must have a window, but it does not have to be mapped.  You get
@@ -111,6 +112,17 @@ stating whether a drop _could_ occur, and what action it will occur with.
 Eventually, you will get an XdndLeave event, or an XdndDrop event. In the latter
 case, you then call XConvertSelection. When the data arrives, you send an
 XdndFinished event back.
+
+Looking at it from the other side, if you initiate a drag, then the first thing
+you do is grab the mouse. Since the mouse is grabbed, other programs will not
+receive events, so you must send XDnD events to the correct window. When your
+mouse pointer enters a window with the XDndAware property, you will send that
+window an XDnDEnter event, informing it that a drag is in progress, and which
+datatypes you can provide. As the mouse moves, you send XdndPosition events, and
+the application replies with XdndStatus. If a drop is possible, then you will
+change the mouse pointer to indicate this. If you leave the XdndAware window,
+you send an XdndLeave event, and if the mouse button is released, you ungrab the
+mouse and send an XdndDrop event (if a drop is possible).
 
 
 [1] XDnD also provides the first three targets in the first message it sends.
