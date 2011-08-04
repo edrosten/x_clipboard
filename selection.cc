@@ -1,14 +1,15 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
-#include <stdio.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
-#include <string>
 #include <map>
 #include <vector>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 using namespace std;
 
 //See paste.cc for a description of how the copy/paste and XDnD state machine works.
@@ -270,10 +271,12 @@ int main(int argc, char**argv)
 	//The 1st command line argument is the selection name. Default is PRIMARY
 	//or alternatively, it can specify DnD operation.
 	if(argc > 1)
+	{
 		if(argv[1] == string("-dnd"))
 			dnd=1;
 		else
 			selection = XInternAtom(disp, argv[1], 0);
+	}
 		
 	
 	//None of these atoms are provided in Xatom.h

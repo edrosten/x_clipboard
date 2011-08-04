@@ -1,8 +1,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <map>
-#include <stdio.h>
 #include <iostream>
+#include <cstdio>
+#include <climits>
+#include <cstring>
 using namespace std;
 
 /*
@@ -295,12 +297,14 @@ int main(int argc, char ** argv)
 	Atom sel = XInternAtom(disp, "PRIMARY", 0);
 
 	if(argc > 1)
+	{
 		if(argv[1] == string("-dnd"))
 			do_xdnd = 1;
 		else if(argv[1] == string("-dndroot"))
 			do_xdnd = 2;
 		else
 			sel = XInternAtom(disp, argv[1], 0);
+	}
 	
 	for(int i=2; i < argc; i++)	
 	{
