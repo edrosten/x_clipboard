@@ -1,0 +1,32 @@
+Try:
+
+./selection [clipboard]
+
+To copy the image to the clipboard in the form of a PNG, JPEG, TIFF, BMP
+URL string or text string. Optionally specify clipboard to use instead of
+PRIMARY.
+
+./selection -dnd
+
+To do the largely same, except with a window to drag the image from rather
+than holding it in the clipboard.
+
+
+
+Then
+
+./paste [type1 [type2 [ ... ] ] ]
+
+Paste the data in PRIMARY (select/middle click) clipboard. Optionally specify
+which datatypes to fetch in order of preference. STRING is used if none are
+specified.
+
+
+./paste -dnd [...]
+
+to do the same, except it provides a window to drop things on to, instead of
+pasting from PRIMARY.
+
+
+
+Operation of these programs is very verbose, and well documented in paste.cc
