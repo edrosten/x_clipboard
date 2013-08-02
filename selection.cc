@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <unistd.h>
 using namespace std;
 
 //See paste.cc for a description of how the copy/paste and XDnD state machine works.
