@@ -439,7 +439,7 @@ int main(int argc, char**argv)
 				//Send an XDnD Leave 
 
 				XClientMessageEvent m;
-				memset(&m, sizeof(m), 0);
+				memset(&m, 0, sizeof(m));
 				m.type = ClientMessage;
 				m.display = e.xclient.display;
 				m.window = previous_window;
@@ -463,7 +463,7 @@ int main(int argc, char**argv)
 				map<Atom, string>::const_iterator i = typed_data.begin();
 
 				XClientMessageEvent m;
-				memset(&m, sizeof(m), 0);
+				memset(&m, 0, sizeof(m));
 				m.type = ClientMessage;
 				m.display = e.xclient.display;
 				m.window = window;
@@ -502,7 +502,7 @@ int main(int argc, char**argv)
 
 
 				XClientMessageEvent m;
-				memset(&m, sizeof(m), 0);
+				memset(&m, 0, sizeof(m));
 				m.type = ClientMessage;
 				m.display = e.xclient.display;
 				m.window = window;
@@ -539,7 +539,7 @@ int main(int argc, char**argv)
 				cout << "Perform drop:\n";
 
 				XClientMessageEvent m;
-				memset(&m, sizeof(m), 0);
+				memset(&m, 0, sizeof(m));
 				m.type = ClientMessage;
 				m.display = e.xclient.display;
 				m.window = previous_window;

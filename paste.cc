@@ -149,7 +149,8 @@ string GetAtomName(Display* disp, Atom a)
 struct Property
 {
 	unsigned char *data;
-	int format, nitems;
+	int format;
+	unsigned long nitems;
 	Atom type;
 };
 
@@ -457,7 +458,7 @@ int main(int argc, char ** argv)
 
 				//Xdnd: reply with an XDND status message
 				XClientMessageEvent m;
-				memset(&m, sizeof(m), 0);
+				memset(&m, 0, sizeof(m));
 				m.type = ClientMessage;
 				m.display = e.xclient.display;
 				m.window = e.xclient.data.l[0];
@@ -487,7 +488,7 @@ int main(int argc, char ** argv)
 					//It's sending anyway, despite instructions to the contrary.
 					//So reply that we're not interested.
 					XClientMessageEvent m;
-					memset(&m, sizeof(m), 0);
+					memset(&m, 0, sizeof(m));
 					m.type = ClientMessage;
 					m.display = e.xclient.display;
 					m.window = e.xclient.data.l[0];
@@ -562,7 +563,7 @@ int main(int argc, char ** argv)
 					{	
 						//Reply OK.
 						XClientMessageEvent m;
-						memset(&m, sizeof(m), 0);
+						memset(&m, 0, sizeof(m));
 						m.type = ClientMessage;
 						m.display = disp;
 						m.window = xdnd_source_window;
