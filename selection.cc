@@ -172,7 +172,7 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 	}
 	else if(typed_data.count(target))
 	{
-		//We're asked to convert to one the formate we know about
+		//We're asked to convert to one the formats we know about
 		cout << "Replying with which ever data I have" << endl;
 
 		//Fill up the property with the URI.

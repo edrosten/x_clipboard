@@ -18,7 +18,7 @@ understand even though they are different applications.
 The first three problems are solved by the X server: it mediates the
 communication in a standard way. The last problem is solved by providing a
 mechanism that allows the two programs to negotiate which data format to
-transfer data in. Esentially, the pasting application asks for a list of
+transfer data in. Essentially, the pasting application asks for a list of
 available formats, and then picks the one it deems most suitable. Unfortunately,
 if both applications can grok types which are nearly equivalent, (such as
 multiple image types), there is no way of telling which is best.
@@ -35,12 +35,12 @@ Atoms
 -----
 
 The server contains a list of Atoms. An atom is a short string with an
-assosciated number. The purpose of this is to avoid passing around
+associated number. The purpose of this is to avoid passing around
 and comparing strings. It is done much more efficiently with atoms
 instead, since only the 4 byte integer ID needs to be passsed and compared.
 
 XInternAtom gets the atom number corresponding to a string.
-XGetAtomName gets the string corresponding ot the atom number.
+XGetAtomName gets the string corresponding to the atom number.
 
 There is a single global list of atoms on the X server.
 
@@ -49,11 +49,11 @@ Properties
 ----------
 
 _EACH_ window has a list of properties. Each list element contains an arbitrary
-bunch of data with a numeric ID, a data type and a format type.  Unsuprisingly,
+bunch of data with a numeric ID, a data type and a format type.  Unsurprisingly,
 atoms are used to give names to these numeric IDs. In other words, the property
 list is indexed by atoms---it's a list of name/value pairs. The data type is a
 string containing a brief textual description of the data (eg a MIME type may be
-used). Unsuprisingly again, this string is stored in an atom.  The format type
+used). Unsurprisingly again, this string is stored in an atom.  The format type
 is the number of bits per element of the data and is either 8, 16 or 32.
 
 The property data is read by XGetWindowProperty.
@@ -67,14 +67,14 @@ Selections
 
 If a bit of data is copied in one application, then the application grabs a
 selection. There can be any number of selections, but there are several
-predefined ones. Each selection has a name (ie an atom) identifing it. The two
+predefined ones. Each selection has a name (ie an atom) identifying it. The two
 useful selections are PRIMARY and CLIPBOARD. Highlight/middle click goes via
 PRIMARY and explicit copy/paste goes via CLIPBOARD.
 
 If you want to paste, then you need to get the selected stuff from the program
-which owns the selection, and get it to convert it in to a format which you can
+which owns the selection, and get it to convert it into a format which you can
 use. For this, you use XConvertSelection. But how does it know which format to
-convert it in to? You tell it the name (ie atom) of the format you want. But how
+convert it into? You tell it the name (ie atom) of the format you want. But how
 do you know what to ask for? Well, first, you ask for a meta-format called
 TARGETS. This causes the program to send you a list of the format names (atoms)
 which it is able to convert to. You can then pick a suitable one from the list
@@ -84,9 +84,9 @@ with the data received a SelectionNotify event.
 All converted data is communicated via a property on the destination window.
 This means you must have a window, but it does not have to be mapped.  You get
 to choose which property you wish it to be communicated via. Once the property
-has been filled up with the data, the program XSendEvent's you a SelectionNotify
-event to tell you that the data is ready to be read. Now you have successfully
-pasted some data.
+has been filled up with the data, the program sends you a SelectionNotify event
+via XSendEvent() to tell you that the data is ready to be read. Now you have
+successfully pasted some data.
 
 
 Drag 'n Drop with XDND
@@ -546,7 +546,7 @@ int main(int argc, char ** argv)
 					}
 					else //Request the data type we are able to select
 					{
-						cerr << "Now requsting type " << GetAtomName(disp, to_be_requested) << endl;
+						cerr << "Now requesting type " << GetAtomName(disp, to_be_requested) << endl;
 						XConvertSelection(disp, sel, to_be_requested, sel, w, CurrentTime);
 					}
 				}
