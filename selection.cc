@@ -47,7 +47,7 @@ Atom XA_XdndFinished;
 
 //The three states of Xdnd: we're over a window which does not
 //know about XDnD, we're over a window which does know, but won't
-//allow a drop (because we offer no suitable datatype), or we're 
+//allow a drop (because we offer no suitable datatype), or we're
 //over a window which will accept a drop.
 #define UNAWARE 0
 #define UNRECEPTIVE 1
@@ -63,7 +63,7 @@ string GetAtomName(Display* disp, Atom a)
 }
 
 
-//A simple, inefficient function for reading a 
+//A simple, inefficient function for reading a
 //whole file in to memory
 string read_whole_file(const string& name, string& fullname)
 {
@@ -75,7 +75,7 @@ string read_whole_file(const string& name, string& fullname)
 		vector<char> buf(4096, 0);
 		getcwd(&buf[0], 4095);
 		fullname = &buf[0] + string("/") + name;
-	}	
+	}
 
 	file.open(fullname.c_str(), ios::binary);
 
@@ -86,7 +86,7 @@ string read_whole_file(const string& name, string& fullname)
 	}
 
 	f << file.rdbuf();
-	
+
 	return f.str();
 }
 
@@ -104,14 +104,14 @@ void set_targets_property(Display* disp, Window w, map<Atom, string>& typed_data
 	for(map<Atom,string>::const_iterator i=typed_data.begin(); i != typed_data.end(); i++)
 		targets.push_back(i->first);
 
-		
+
 	cout << "Offering: ";
 	for(unsigned int i = 0; i < targets.size(); i++)
 		cout << GetAtomName(disp, targets[i]) << "  ";
 	cout << endl;
 
 	//Fill up this property with a list of targets.
-	XChangeProperty(disp, w, property, XA_ATOM, 32, PropModeReplace, 
+	XChangeProperty(disp, w, property, XA_ATOM, 32, PropModeReplace,
 					(unsigned char*)&targets[0], targets.size());
 }
 
@@ -137,12 +137,12 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 
 	cout << "A selection request has arrived!\n";
 	cout << hex << "Owner = 0x" << owner << endl;
-	cout << "Selection atom = " << GetAtomName(disp, selection) << endl;	
-	cout << "Target atom    = " << GetAtomName(disp, target)    << endl;	
-	cout << "Property atom  = " << GetAtomName(disp, property) << endl;	
+	cout << "Selection atom = " << GetAtomName(disp, selection) << endl;
+	cout << "Target atom    = " << GetAtomName(disp, target)    << endl;
+	cout << "Property atom  = " << GetAtomName(disp, property) << endl;
 	cout << hex << "Requestor = 0x" << requestor << dec << endl;
 	cout << "Timestamp = " << timestamp << endl;
-	
+
 
 	//X should only send requests for the selections since we own.
 	//since we own exaclty one, we don't need to check it.
@@ -177,31 +177,31 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 
 		//Fill up the property with the URI.
 		s.xselection.property = property;
-		XChangeProperty(disp, requestor, property, target, 8, PropModeReplace, 
+		XChangeProperty(disp, requestor, property, target, 8, PropModeReplace,
 						reinterpret_cast<const unsigned char*>(typed_data[target].c_str()), typed_data[target].size());
 	}
 	else if(target == XA_multiple)
 	{
 		//In this case, the property has been filled up with a list
-		//of atom pairs. The pairs being (target, property). The 
+		//of atom pairs. The pairs being (target, property). The
 		//processing should continue as if whole bunch of
-		//SelectionRequest events had been received with the 
+		//SelectionRequest events had been received with the
 		//targets and properties specified.
 
 		//The ICCCM is rather ambiguous and confusing on this particular point,
-		//and I've never encountered a program which requests this (I can't 
+		//and I've never encountered a program which requests this (I can't
 		//test it), so I haven't implemented it.
 
 		cout << "MULTIPLE is not implemented. It should be, according to the ICCCM, but\n"
 			 << "I've never encountered it, so I can't test it.\n";
 	}
 	else
-	{	
+	{
 		//We've been asked to convert to something we don't know
 		//about.
 		cout << "No valid conversion. Replying with refusal.\n";
 	}
-	
+
 	//Reply
 	XSendEvent(disp, e.xselectionrequest.requestor, True, 0, &s);
 	cout << endl;
@@ -231,7 +231,7 @@ Window find_app_window(Display* disp, Window w)
 
 	if(i != nprops)
 		return w;
-	
+
 	//Drill down one more level.
 	Window child, wtmp;
 	int tmp;
@@ -246,12 +246,12 @@ Window find_app_window(Display* disp, Window w)
 
 int main(int argc, char**argv)
 {
-	
+
 	Display* disp;
 	Window root, w;
 	int screen;
 	XEvent e;
-	
+
 	//Standard X init stuff
 	disp = XOpenDisplay(NULL);
 	screen = DefaultScreen(disp);
@@ -260,7 +260,7 @@ int main(int argc, char**argv)
 	//A window is required to perform copy/paste operations
 	//but it does not need to be mapped.
 	w = XCreateSimpleWindow(disp, root, 0, 0, 100, 100, 0, BlackPixel(disp, screen), BlackPixel(disp, screen));
-	
+
 
 	cerr << "Created window: 0x" << hex <<  w << dec << endl << endl;
 
@@ -278,8 +278,8 @@ int main(int argc, char**argv)
 		else
 			selection = XInternAtom(disp, argv[1], 0);
 	}
-		
-	
+
+
 	//None of these atoms are provided in Xatom.h
 	XA_TARGETS = XInternAtom(disp, "TARGETS", False);
 	XA_multiple = XInternAtom(disp, "MULTIPLE", False);
@@ -301,13 +301,13 @@ int main(int argc, char**argv)
 	XA_XdndStatus = XInternAtom(disp, "XdndStatus", False);
 	XA_XdndDrop = XInternAtom(disp, "XdndDrop", False);
 	XA_XdndFinished = XInternAtom(disp, "XdndFinished", False);
-	
+
 	//Create a mapping between the data type (specified as an atom) and the
 	//actual data. The data consists of a prespecified list of files in the
 	//current or install directory, and the URL of the PNG, in various
-	//incarnations. 
+	//incarnations.
 	map<Atom, string> typed_data; string url;
-	
+
 	typed_data[XA_image_bmp] = read_whole_file("r0x0r.bmp", url);
 	typed_data[XA_image_jpg] = read_whole_file("r0x0r.jpg", url);
 	typed_data[XA_image_tiff] = read_whole_file("r0x0r.tiff", url);
@@ -321,12 +321,12 @@ int main(int argc, char**argv)
 	typed_data[XA_text] = url;
 	typed_data[XA_STRING] = url;
 
-	
-	
+
+
 	if(dnd)
 	{
 		//We need to map the window to drag from
-		XMapWindow(disp, w);	
+		XMapWindow(disp, w);
 		XSelectInput(disp, w, Button1MotionMask | ButtonReleaseMask);
 
 		//We set this, so that TARGETS does not need to be called, as
@@ -341,12 +341,12 @@ int main(int argc, char**argv)
 
 	XFlush(disp);
 
-	
+
 	bool dragging = 0;                 //Are we currently dragging
 	Window previous_window = 0;        //Window found by the last MotionNotify event.
 	int previous_version = -1;         //XDnD version of previous_window
 	int status = UNAWARE;
-	
+
 
 	//Create three cursors for the three different XDnD states.
 	//I think a turkey is a good choice for a program which doesn't
@@ -358,7 +358,7 @@ int main(int argc, char**argv)
 	for(;;)
 	{
 		XNextEvent(disp, &e);
-		
+
 		//Wait until something asks for the selection or until we loose the selection.
 		if(e.type == SelectionClear)
 		{
@@ -392,12 +392,12 @@ int main(int argc, char**argv)
 			unsigned long nitems, bytes_remaining;
 			unsigned char *data = 0;
 
-			//Look for XdndAware in the window under the pointer. So, first, 
+			//Look for XdndAware in the window under the pointer. So, first,
 			//find the window under the pointer.
 			window = find_app_window(disp, root);
 			cout << "Application window is: 0x" << hex << window << dec << endl;
-			
-			
+
+
 
 			if(window == previous_window)
 				version = previous_version;
@@ -430,13 +430,13 @@ int main(int argc, char**argv)
 			else
 				XChangeActivePointerGrab(disp, Button1MotionMask | ButtonReleaseMask, grab_good, CurrentTime);
 
-			
+
 
 			if(window != previous_window && previous_version != -1)
 			{
 				cout << "Left window 0x" << hex << previous_window  << dec << ": sending XdndLeave\n";
 				//We've left an old, aware window.
-				//Send an XDnD Leave 
+				//Send an XDnD Leave
 
 				XClientMessageEvent m;
 				memset(&m, 0, sizeof(m));
@@ -456,7 +456,7 @@ int main(int argc, char**argv)
 			}
 
 			if(window != previous_window && version != -1)
-			{	
+			{
 				cout << "Entered window 0x" << hex << window  << dec << ": sending XdndLeave\n";
 				//We've entered a new, aware window.
 				//Send an XDnD Enter event.
@@ -490,7 +490,7 @@ int main(int argc, char**argv)
 			{
 				//Send an XdndPosition event.
 				//
-				// We're being abusive, and ignoring the 
+				// We're being abusive, and ignoring the
 				// rectangle of silence.
 
 
@@ -525,7 +525,7 @@ int main(int argc, char**argv)
 
 			}
 
-			previous_window = window;	
+			previous_window = window;
 			previous_version = version;
 			cout << endl;
 		}
@@ -575,7 +575,7 @@ int main(int argc, char**argv)
 			      << "    Rectangle of silence h  = " << (e.xclient.data.l[3] & 0xffff)    << endl
 			      << "    Action                  = " << GetAtomName(disp, e.xclient.data.l[4]) << endl;
 
-			
+
 			if( (e.xclient.data.l[1] & 1) == 0 &&  e.xclient.data.l[4] != None)
 			{
 				cout << "Action is given, even though the target won't accept a drop.\n";
@@ -606,7 +606,7 @@ int main(int argc, char**argv)
 			      << "    Target window           = 0x" << hex << e.xclient.data.l[0] << dec << endl
 			      << "    Was successful          = " << (e.xclient.data.l[1] & 1)  << endl
 			      << "    Action                  = " << GetAtomName(disp, e.xclient.data.l[2]) << endl;
-			
+
 			cout  << "No action performed.\n\n";
 		}
 

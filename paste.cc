@@ -8,7 +8,7 @@
 using namespace std;
 
 /*
-	
+
 Copying and pasting is in general a difficult problem: the application doing the
 pasting has to first know where to get the data from, and then the two
 applications (probably written by different people, maybe running on different
@@ -78,7 +78,7 @@ convert it into? You tell it the name (ie atom) of the format you want. But how
 do you know what to ask for? Well, first, you ask for a meta-format called
 TARGETS. This causes the program to send you a list of the format names (atoms)
 which it is able to convert to. You can then pick a suitable one from the list
-and ask for it. When you ask for data using XConvertSelection, the program you 
+and ask for it. When you ask for data using XConvertSelection, the program you
 with the data received a SelectionNotify event.
 
 All converted data is communicated via a property on the destination window.
@@ -167,8 +167,8 @@ Property read_property(Display* disp, Window w, Atom property)
 	unsigned long nitems;
 	unsigned long bytes_after;
 	unsigned char *ret = 0;
-	
-	int read_bytes = 1024;	
+
+	int read_bytes = 1024;
 
 	//Keep trying to read the property until there are no
 	//bytes unread.
@@ -177,12 +177,12 @@ Property read_property(Display* disp, Window w, Atom property)
 		if(ret != 0)
 			XFree(ret);
 		XGetWindowProperty(disp, w, property, 0, read_bytes, False, AnyPropertyType,
-							&actual_type, &actual_format, &nitems, &bytes_after, 
+							&actual_type, &actual_format, &nitems, &bytes_after,
 							&ret);
 
 		read_bytes *= 2;
 	}while(bytes_after != 0);
-	
+
 	cerr << endl;
 	cerr << "Actual type: " << GetAtomName(disp, actual_type) << endl;
 	cerr << "Actual format: " << actual_format << endl;
@@ -207,12 +207,12 @@ Atom pick_target_from_list(Display* disp, Atom* atom_list, int nitems, map<strin
 	{
 		string atom_name = GetAtomName(disp, atom_list[i]);
 		cerr << "Type " << i << " = " << atom_name << endl;
-	
+
 		//See if this data type is allowed and of higher priority (closer to zero)
 		//than the present one.
 		if(datatypes.find(atom_name)!= datatypes.end())
 			if(priority > datatypes[atom_name])
-			{	
+			{
 				cerr << "Will request type: " << atom_name << endl;
 				priority = datatypes[atom_name];
 				to_be_requested = atom_list[i];
@@ -249,7 +249,7 @@ Atom pick_target_from_targets(Display* disp, Property p, map<string, int> dataty
 	//but it may have the type TARGETS instead.
 
 	if((p.type != XA_ATOM && p.type != XA_TARGETS) || p.format != 32)
-	{ 
+	{
 		//This would be really broken. Targets have to be an atom list
 		//and applications should support this. Nevertheless, some
 		//seem broken (MATLAB 7, for instance), so ask for STRING
@@ -263,7 +263,7 @@ Atom pick_target_from_targets(Display* disp, Property p, map<string, int> dataty
 	else
 	{
 		Atom *atom_list = (Atom*)p.data;
-		
+
 		return pick_target_from_list(disp, atom_list, p.nitems, datatypes);
 	}
 }
@@ -272,12 +272,12 @@ Atom pick_target_from_targets(Display* disp, Property p, map<string, int> dataty
 
 int main(int argc, char ** argv)
 {
-	
+
 	Display* disp;
 	Window root, w, drop_window;
 	int screen;
 	XEvent e;
-	
+
 	//The usual Xinit stuff...
 	disp = XOpenDisplay(NULL);
 	screen = DefaultScreen(disp);
@@ -306,12 +306,12 @@ int main(int argc, char ** argv)
 		else
 			sel = XInternAtom(disp, argv[1], 0);
 	}
-	
-	for(int i = 2; i < argc; i++)	
+
+	for(int i = 2; i < argc; i++)
 	{
 		datatypes[argv[i]] = i;
 	}
-	
+
 	//The default if there is no command line argument
 	if(datatypes.empty())
 		datatypes["STRING"] = 1;
@@ -348,7 +348,7 @@ int main(int argc, char ** argv)
 			XGrabServer(disp);
 			//Check for the existence of XdndProxy
 			Property p = read_property(disp, root, XdndProxy);
-			
+
 			if(p.type == None)
 			{
 				//Property does not exist, so set it to redirect to me
@@ -403,7 +403,7 @@ int main(int argc, char ** argv)
 	for(;;)
 	{
 		XNextEvent(disp, &e);
-		
+
 		if(e.type == ClientMessage)
 		{
 			cerr << "A ClientMessage has arrived:\n";
@@ -448,13 +448,13 @@ int main(int argc, char ** argv)
 				cerr << hex << "Source window = 0x" << e.xclient.data.l[0] << dec << endl;
 				cerr << "Position: x=" << (e.xclient.data.l[2]  >> 16) << " y=" << (e.xclient.data.l[2] &0xffff)  << endl;
 				cerr << "Timestamp = " << e.xclient.data.l[3] << " (Version >= 1 only)\n";
-				
+
 				Atom action = XdndActionCopy;
 				if(xdnd_version >= 2)
 					action = e.xclient.data.l[4];
 
 				cerr << "Action = " << GetAtomName(disp, action) << " (Version >= 2 only)\n";
-				
+
 
 				//Xdnd: reply with an XDND status message
 				XClientMessageEvent m;
@@ -518,8 +518,8 @@ int main(int argc, char ** argv)
 
 			cerr << "A selection notify has arrived!\n";
 			cerr << hex << "Requestor = 0x" << e.xselectionrequest.requestor << dec << endl;
-			cerr << "Selection atom = " << GetAtomName(disp, e.xselection.selection) << endl;	
-			cerr << "Target atom    = " << GetAtomName(disp, target)    << endl;	
+			cerr << "Selection atom = " << GetAtomName(disp, e.xselection.selection) << endl;
+			cerr << "Target atom    = " << GetAtomName(disp, target)    << endl;
 			cerr << "Property atom  = " << GetAtomName(disp, e.xselection.property) << endl;
 
 			if(e.xselection.property == None)
@@ -529,7 +529,7 @@ int main(int argc, char ** argv)
 				//then quit with code 3.
 				return 2 + (target == XA_TARGETS);
 			}
-			else 
+			else
 			{
 				Property prop = read_property(disp, w, sel);
 
@@ -560,7 +560,7 @@ int main(int argc, char ** argv)
 					cerr << endl << "--------" << endl << "Data ends\n";
 
 					if(do_xdnd)
-					{	
+					{
 						//Reply OK.
 						XClientMessageEvent m;
 						memset(&m, 0, sizeof(m));
