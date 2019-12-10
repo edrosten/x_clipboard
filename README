@@ -1,10 +1,10 @@
 Try:
 
-./selection [clipboard]
+./selection [<clipboard>]
 
-To copy the image to the clipboard in the form of a PNG, JPEG, TIFF, BMP
-URL string or text string. Optionally specify clipboard to use instead of
-PRIMARY.
+To copy the image to the <clipboard> in the form of a PNG, JPEG, TIFF,
+BMP URL string or text string. If you do not specify <clipboard>
+PRIMARY will be used.
 
 ./selection -dnd
 
@@ -15,11 +15,11 @@ than holding it in the clipboard.
 
 Then
 
-./paste [type1 [type2 [ ... ] ] ]
+./paste [<clipboard> [type1 [type2 [ ... ] ] ] ]
 
-Paste the data in PRIMARY (select/middle click) clipboard. Optionally specify
-which datatypes to fetch in order of preference. STRING is used if none are
-specified.
+Paste the data in <clipboard> or PRIMARY (select/middle click). You must
+specify <clipboard> if you want to specify which datatypes to fetch in
+order of preference. STRING is used if none are specified.
 
 
 ./paste -dnd [...]
