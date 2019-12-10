@@ -166,7 +166,7 @@ Property read_property(Display* disp, Window w, Atom property)
 	int actual_format;
 	unsigned long nitems;
 	unsigned long bytes_after;
-	unsigned char *ret=0;
+	unsigned char *ret = 0;
 	
 	int read_bytes = 1024;	
 
@@ -201,9 +201,9 @@ Atom pick_target_from_list(Display* disp, Atom* atom_list, int nitems, map<strin
 {
 	Atom to_be_requested = None;
 	//This is higger than the maximum priority.
-	int priority=INT_MAX;
+	int priority = INT_MAX;
 
-	for(int i=0; i < nitems; i++)
+	for(int i = 0; i < nitems; i++)
 	{
 		string atom_name = GetAtomName(disp, atom_list[i]);
 		cerr << "Type " << i << " = " << atom_name << endl;
@@ -227,7 +227,7 @@ Atom pick_target_from_list(Display* disp, Atom* atom_list, int nitems, map<strin
 Atom pick_target_from_atoms(Display* disp, Atom t1, Atom t2, Atom t3, map<string, int> datatypes)
 {
 	Atom atoms[3];
-	int  n=0;
+	int  n = 0;
 
 	if(t1 != None)
 		atoms[n++] = t1;
@@ -283,7 +283,7 @@ int main(int argc, char ** argv)
 	screen = DefaultScreen(disp);
 	root = RootWindow(disp, screen);
 
-	int do_xdnd=0;
+	int do_xdnd = 0;
 
 	//Process commandline args
 
@@ -307,7 +307,7 @@ int main(int argc, char ** argv)
 			sel = XInternAtom(disp, argv[1], 0);
 	}
 	
-	for(int i=2; i < argc; i++)	
+	for(int i = 2; i < argc; i++)	
 	{
 		datatypes[argv[i]] = i;
 	}
@@ -372,7 +372,7 @@ int main(int argc, char ** argv)
 
 		//Announce XDND support
 		Atom XdndAware = XInternAtom(disp, "XdndAware", False);
-		Atom version=5;
+		Atom version = 5;
 		XChangeProperty(disp, w, XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char*)&version, 1);
 	}
 
@@ -397,8 +397,8 @@ int main(int argc, char ** argv)
 
 	Atom to_be_requested = None;
 	bool sent_request = 0;
-	int xdnd_version=0;
-	Window xdnd_source_window=None;
+	int xdnd_version = 0;
+	Window xdnd_source_window = None;
 
 	for(;;)
 	{
@@ -449,7 +449,7 @@ int main(int argc, char ** argv)
 				cerr << "Position: x=" << (e.xclient.data.l[2]  >> 16) << " y=" << (e.xclient.data.l[2] &0xffff)  << endl;
 				cerr << "Timestamp = " << e.xclient.data.l[3] << " (Version >= 1 only)\n";
 				
-				Atom action=XdndActionCopy;
+				Atom action = XdndActionCopy;
 				if(xdnd_version >= 2)
 					action = e.xclient.data.l[4];
 
@@ -463,7 +463,7 @@ int main(int argc, char ** argv)
 				m.display = e.xclient.display;
 				m.window = e.xclient.data.l[0];
 				m.message_type = XdndStatus;
-				m.format=32;
+				m.format = 32;
 				m.data.l[0] = drop_window;
 				m.data.l[1] = (to_be_requested != None);
 				m.data.l[2] = 0; //Specify an empty rectangle
@@ -493,7 +493,7 @@ int main(int argc, char ** argv)
 					m.display = e.xclient.display;
 					m.window = e.xclient.data.l[0];
 					m.message_type = XdndFinished;
-					m.format=32;
+					m.format = 32;
 					m.data.l[0] = drop_window;
 					m.data.l[1] = 0;
 					m.data.l[2] = None; //Failed.
@@ -568,7 +568,7 @@ int main(int argc, char ** argv)
 						m.display = disp;
 						m.window = xdnd_source_window;
 						m.message_type = XdndFinished;
-						m.format=32;
+						m.format = 32;
 						m.data.l[0] = w;
 						m.data.l[1] = 1;
 						m.data.l[2] = XdndActionCopy; //We only ever copy.

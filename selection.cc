@@ -106,7 +106,7 @@ void set_targets_property(Display* disp, Window w, map<Atom, string>& typed_data
 
 		
 	cout << "Offering: ";
-	for(unsigned int i=0; i < targets.size(); i++)
+	for(unsigned int i = 0; i < targets.size(); i++)
 		cout << GetAtomName(disp, targets[i]) << "  ";
 	cout << endl;
 
@@ -152,7 +152,7 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 	XEvent s;
 
 	//Start by constructing a refusal request.
-	s.xselection.type = SelectionNotify;
+	s.xselection.type      = SelectionNotify;
 	//s.xselection.serial     - filled in by server
 	//s.xselection.send_event - filled in by server
 	//s.xselection.display    - filled in by server
@@ -172,7 +172,7 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 	}
 	else if(typed_data.count(target))
 	{
-		//We're asked to convert to one the formats we know about
+		//We're asked to convert to one of the formats we know about
 		cout << "Replying with which ever data I have" << endl;
 
 		//Fill up the property with the URI.
@@ -197,7 +197,7 @@ void process_selection_request(XEvent e, map<Atom, string>& typed_data)
 	}
 	else
 	{	
-		//We've been asked to converto to something we don't know 
+		//We've been asked to convert to something we don't know
 		//about.
 		cout << "No valid conversion. Replying with refusal.\n";
 	}
@@ -214,7 +214,7 @@ Window find_app_window(Display* disp, Window w)
 	//Drill down the windows under the mouse, looking for
 	//the window with the XdndAware property.
 
-	int nprops, i=0;
+	int nprops, i = 0;
 	Atom* a;
 
 	if(w == 0)
@@ -222,7 +222,7 @@ Window find_app_window(Display* disp, Window w)
 
 	//Search for the WM_STATE property
 	a = XListProperties(disp, w, &nprops);
-	for(i=0; i < nprops; i++)
+	for(i = 0; i < nprops; i++)
 		if(a[i] == XA_XdndAware)
 			break;
 
@@ -265,8 +265,8 @@ int main(int argc, char**argv)
 	cerr << "Created window: 0x" << hex <<  w << dec << endl << endl;
 
 
-	bool dnd=0;
-	Atom selection  = XA_PRIMARY;
+	bool dnd = 0;
+	Atom selection = XA_PRIMARY;
 
 
 	//The 1st command line argument is the selection name. Default is PRIMARY
@@ -274,7 +274,7 @@ int main(int argc, char**argv)
 	if(argc > 1)
 	{
 		if(argv[1] == string("-dnd"))
-			dnd=1;
+			dnd = 1;
 		else
 			selection = XInternAtom(disp, argv[1], 0);
 	}
@@ -342,18 +342,18 @@ int main(int argc, char**argv)
 	XFlush(disp);
 
 	
-	bool dragging=0;                   //Are we currently dragging
-	Window previous_window=0;          //Window found by the last MotionNotify event.
+	bool dragging = 0;                 //Are we currently dragging
+	Window previous_window = 0;        //Window found by the last MotionNotify event.
 	int previous_version = -1;         //XDnD version of previous_window
-	int status=UNAWARE;               
+	int status = UNAWARE;
 	
 
 	//Create three cursors for the three different XDnD states.
 	//I think a turkey is a good choice for a program which doesn't
 	//understand Xdnd.
-	Cursor grab_bad =XCreateFontCursor(disp, XC_gobbler);
-	Cursor grab_maybe =XCreateFontCursor(disp, XC_circle);
-	Cursor grab_good =XCreateFontCursor(disp, XC_sb_down_arrow);
+	Cursor grab_bad = XCreateFontCursor(disp, XC_gobbler);
+	Cursor grab_maybe = XCreateFontCursor(disp, XC_circle);
+	Cursor grab_good = XCreateFontCursor(disp, XC_sb_down_arrow);
 
 	for(;;)
 	{
@@ -374,7 +374,7 @@ int main(int argc, char**argv)
 		{
 			if(XGrabPointer(disp, w, True, Button1MotionMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, root, grab_bad, CurrentTime) == GrabSuccess)
 			{
-				dragging=1;
+				dragging = 1;
 				XSetSelectionOwner(disp, XA_XdndSelection, w, CurrentTime);
 				cout << "Begin dragging.\n\n";
 			}
@@ -385,9 +385,9 @@ int main(int argc, char**argv)
 		{
 			cout << "Dragged pointer moved: " << endl;
 
-			Window window=0;
+			Window window = 0;
 			Atom atmp;
-			int version=-1;
+			int version = -1;
 			int fmt;
 			unsigned long nitems, bytes_remaining;
 			unsigned char *data = 0;
@@ -444,7 +444,7 @@ int main(int argc, char**argv)
 				m.display = e.xclient.display;
 				m.window = previous_window;
 				m.message_type = XA_XdndLeave;
-				m.format=32;
+				m.format = 32;
 				m.data.l[0] = w;
 				m.data.l[1] = 0;
 				m.data.l[2] = 0;
@@ -468,7 +468,7 @@ int main(int argc, char**argv)
 				m.display = e.xclient.display;
 				m.window = window;
 				m.message_type = XA_XdndEnter;
-				m.format=32;
+				m.format = 32;
 				m.data.l[0] = w;
 				m.data.l[1] = min(5, version) << 24  |  (typed_data.size() > 3);
 				m.data.l[2] = typed_data.size() > 0 ? i++->first : 0;
@@ -507,7 +507,7 @@ int main(int argc, char**argv)
 				m.display = e.xclient.display;
 				m.window = window;
 				m.message_type = XA_XdndPosition;
-				m.format=32;
+				m.format = 32;
 				m.data.l[0] = w;
 				m.data.l[1] = 0;
 				m.data.l[2] = (x <<16) | y;
@@ -544,7 +544,7 @@ int main(int argc, char**argv)
 				m.display = e.xclient.display;
 				m.window = previous_window;
 				m.message_type = XA_XdndDrop;
-				m.format=32;
+				m.format = 32;
 				m.data.l[0] = w;
 				m.data.l[1] = 0;
 				m.data.l[2] = CurrentTime; //Our data is not time dependent, so send a generic timestamp;
@@ -557,10 +557,10 @@ int main(int argc, char**argv)
 
 
 			XUngrabPointer(disp, CurrentTime);
-			dragging=0;
-			status=UNAWARE;
-			previous_window=None;
-			previous_version=-1;
+			dragging = 0;
+			status = UNAWARE;
+			previous_window = None;
+			previous_version = -1;
 			cout << endl;
 		}
 		else if(e.type == ClientMessage && e.xclient.message_type == XA_XdndStatus)
@@ -614,4 +614,3 @@ int main(int argc, char**argv)
 
 	return 0;
 }
-
