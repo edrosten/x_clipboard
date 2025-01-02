@@ -498,7 +498,7 @@ int main(int argc, char**argv)
 				unsigned int utmp;
 				Window wtmp;
 
-				XQueryPointer(disp, window, &wtmp, &wtmp, &tmp, &tmp, &x, &y, &utmp);
+				XQueryPointer(disp, window, &wtmp, &wtmp, &x, &y, &tmp, &tmp, &utmp);
 
 
 				XClientMessageEvent m;
