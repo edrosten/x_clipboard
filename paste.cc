@@ -78,8 +78,8 @@ convert it into? You tell it the name (ie atom) of the format you want. But how
 do you know what to ask for? Well, first, you ask for a meta-format called
 TARGETS. This causes the program to send you a list of the format names (atoms)
 which it is able to convert to. You can then pick a suitable one from the list
-and ask for it. When you ask for data using XConvertSelection, the program you
-with the data received a SelectionNotify event.
+and ask for it. When you ask for data using XConvertSelection, the program 
+with the data receives a SelectionNotify event.
 
 All converted data is communicated via a property on the destination window.
 This means you must have a window, but it does not have to be mapped.  You get
